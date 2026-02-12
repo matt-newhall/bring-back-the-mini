@@ -1,0 +1,13 @@
+{
+  "name": "bring-back-the-mini",
+  "version": "0.1.0",
+  "description": "Chrome extension to make the NY Times Mini daily game playable again",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.276",
+    "typescript": "^5.7.2"
+  }
+}

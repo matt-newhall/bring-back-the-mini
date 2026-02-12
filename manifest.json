@@ -1,0 +1,12 @@
+{
+  "name": "Bring Back the Mini",
+  "description": "Small Chrome extension to make the NY Times Mini daily game playable again.",
+  "version": "0.1",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://www.nytimes.com/crosswords/game/mini"],
+      "js": ["dist/enableContent.js"]
+    }
+  ]
+}
