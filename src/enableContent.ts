@@ -29,8 +29,14 @@ const unhideClues = () => {
   document.head.appendChild(styleOverrideElement)
 }
 
+const unobscureBanner = () => {
+  const element = document.querySelector('.xwd__clue-bar-desktop--bar')
+  element?.classList.remove("obscured")
+}
+
 deleteOverlay(".xwd__modal--wrapper")
   .then(() => {
     unhideClues()
+    unobscureBanner()
   })
   .catch(err => console.error(err))
