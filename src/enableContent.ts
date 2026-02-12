@@ -20,4 +20,11 @@ const deleteOverlay = (selector: string, maxAttempts = 3, delay = 200) => {
   attemptUntilDeleteOrBackoff()
 }
 
+const unhideClues = () => {
+  const styleOverrideElement = document.createElement('style')
+  styleOverrideElement.innerHTML = '.xwd__clue-list--obscured li span:last-child {background-color:transparent;color:unset}'
+  document.head.appendChild(styleOverrideElement)
+}
+
 deleteOverlay(".xwd__modal--wrapper")
+unhideClues()
