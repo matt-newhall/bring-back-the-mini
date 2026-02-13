@@ -35,10 +35,14 @@ const unobscureBanner = () => {
 }
 
 const parseAriaLabel = (ariaLabel: string) => {
+  const cellLocation = ariaLabel.slice(0, 2)
+  const clueMatch = ariaLabel.match(new RegExp(`${cellLocation}: (.+?), Answer:`))
   const answerMatch = ariaLabel.match(/Answer: (\d+) letters/)
   const letterMatch = ariaLabel.match(/Letter: (\d+)/)
 
   return {
+    cellLocation,
+    clueMatch: clueMatch ? clueMatch[1] : null,
     answerLength: answerMatch ? parseInt(answerMatch[1]) : null,
     letterPosition: letterMatch ? parseInt(letterMatch[1]) : null
   }
@@ -70,6 +74,33 @@ const findNextCell = (currentRect: Element, direction: 'forward' | 'backward') =
   }
 
   return null
+}
+
+const updateClue = () => {
+  const rect = document.querySelector('rect[tabindex="0"]')
+  if (rect) {
+    const ariaLabel = rect.getAttribute('aria-label')
+    if (ariaLabel) {
+      const { cellLocation, clueMatch } = parseAriaLabel(ariaLabel)
+
+      const element = document.querySelector('.xwd__clue-bar-desktop--bar')
+      if (element && clueMatch) {
+        Array.from(element.childNodes).forEach(node => {
+          node.remove()
+        })
+
+        const locationPromptElement = document.createElement('div')
+        locationPromptElement.className = "xwd__clue-bar-desktop--number"
+        locationPromptElement.innerText = cellLocation
+        element.appendChild(locationPromptElement)
+
+        const cluePromptElement = document.createElement('div')
+        cluePromptElement.className = "xwd__clue-bar-desktop--text xwd__clue-format"
+        cluePromptElement.innerText = clueMatch
+        element.appendChild(cluePromptElement)
+      }
+    }
+  }
 }
 
 const makePlayable = () => {
@@ -112,7 +143,6 @@ const makePlayable = () => {
               nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
               (nextRect as HTMLElement).focus()
             }
-
           }
         }
       }
@@ -146,11 +176,18 @@ const makePlayable = () => {
               nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
               (nextRect as HTMLElement).focus()
             }
-
           }
         }
       }
     }
+  })
+
+  document.addEventListener('focusin', () => {
+    updateClue()
+  })
+
+  document.addEventListener('click', () => {
+    updateClue()
   })
 }
 
