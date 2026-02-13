@@ -151,30 +151,45 @@ const makePlayable = () => {
       if (activeCell?.getAttribute('role') === 'cell') {
         const parentText = activeCell.parentElement?.querySelector('text[font-size="66.67"]')
 
+        let foundLetter = false;
         if (parentText) {
           Array.from(parentText.childNodes).forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
+              foundLetter = true;
               node.remove()
             }
           })
         }
 
-        const rect = document.querySelector('rect[tabindex="0"]')
-        const ariaLabel = rect?.getAttribute('aria-label')
+        if (!foundLetter) {
+          const rect = document.querySelector('rect[tabindex="0"]')
+          const ariaLabel = rect?.getAttribute('aria-label')
 
-        if (ariaLabel && rect) {
-          const { answerLength, letterPosition } = parseAriaLabel(ariaLabel)
+          if (ariaLabel && rect) {
+            const { letterPosition } = parseAriaLabel(ariaLabel)
 
-          const canMoveBackward = letterPosition !== null && letterPosition > 1
-          if (canMoveBackward) {
-            rect.setAttribute('tabindex', '-1')
-            rect.classList.remove('xwd__cell--selected')
+            const canMoveBackward = letterPosition !== null && letterPosition > 1
+            if (canMoveBackward) {
+              rect.setAttribute('tabindex', '-1')
+              rect.classList.remove('xwd__cell--selected')
 
-            const nextRect = findNextCell(rect, 'backward')
-            if (nextRect) {
-              nextRect.setAttribute('tabindex', '0')
-              nextRect.classList.add('xwd__cell--selected');
-              (nextRect as HTMLElement).focus()
+              const nextRect = findNextCell(rect, 'backward')
+              if (nextRect) {
+                nextRect.setAttribute('tabindex', '0')
+                nextRect.classList.add('xwd__cell--selected');
+                (nextRect as HTMLElement).focus()
+              }
+            }
+          }
+
+          if (document.activeElement) {
+            const newParent = document.activeElement.parentElement?.querySelector('text[font-size="66.67"]')
+            if (newParent) {
+              Array.from(newParent.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                  node.remove()
+                }
+              })
             }
           }
         }
