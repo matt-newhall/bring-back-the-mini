@@ -173,8 +173,10 @@ const makePlayable = () => {
     if (e.key.match(/^[a-zA-Z]$/)) {
       const parentText = getActiveText(activeCell)
 
-      if (parentText?.querySelector('.xwd__cell--hidden')) {
+      const hiddenText = parentText?.querySelector('.xwd__cell--hidden')
+      if (parentText && hiddenText) {
         removeTextNodes(parentText)
+        hiddenText.textContent = e.key.toUpperCase()
         parentText.appendChild(document.createTextNode(e.key.toUpperCase()))
       }
 
@@ -187,7 +189,9 @@ const makePlayable = () => {
       }
     } else if (e.key === "Backspace" || e.key === "Delete") {
       const parentText = getActiveText(activeCell)
+      const hiddenText = parentText?.querySelector('.xwd__cell--hidden')
       const hadLetter = parentText ? removeTextNodes(parentText) : false
+      if (hiddenText) hiddenText.textContent = ''
 
       if (!hadLetter) {
         const active = getActiveRect()
@@ -201,6 +205,8 @@ const makePlayable = () => {
         const newParent = document.activeElement ? getActiveText(document.activeElement) : null
         if (newParent) {
           removeTextNodes(newParent)
+          const newHiddenText = newParent.querySelector('.xwd__cell--hidden')
+          if (newHiddenText) newHiddenText.textContent = ''
         }
       }
     }
