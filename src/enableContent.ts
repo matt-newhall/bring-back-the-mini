@@ -34,6 +34,44 @@ const unobscureBanner = () => {
   element?.classList.remove("obscured")
 }
 
+const parseAriaLabel = (ariaLabel: string) => {
+  const answerMatch = ariaLabel.match(/Answer: (\d+) letters/)
+  const letterMatch = ariaLabel.match(/Letter: (\d+)/)
+
+  return {
+    answerLength: answerMatch ? parseInt(answerMatch[1]) : null,
+    letterPosition: letterMatch ? parseInt(letterMatch[1]) : null
+  }
+}
+
+const findNextCell = (currentRect: Element, direction: 'forward' | 'backward') => {
+  const currentLabel = currentRect.getAttribute('aria-label')
+  if (!currentLabel) return null
+
+  const { letterPosition } = parseAriaLabel(currentLabel)
+  if (!letterPosition) return null
+
+  const nextLetterNum = direction === 'forward'
+    ? letterPosition + 1
+    : letterPosition - 1
+
+  const cluePrefix = currentLabel.split(',')[0]
+
+  const allRects = document.querySelectorAll('rect[role="cell"]')
+
+  for (const rect of allRects) {
+    const label = rect.getAttribute('aria-label')
+    if (label && label.startsWith(cluePrefix)) {
+      const { letterPosition: pos } = parseAriaLabel(label)
+      if (pos === nextLetterNum) {
+        return rect
+      }
+    }
+  }
+
+  return null
+}
+
 const makePlayable = () => {
   document.addEventListener('keydown', (e) => {
     if (e.key.match(/^[a-zA-Z]$/)) {
@@ -56,6 +94,27 @@ const makePlayable = () => {
             parentText.appendChild(document.createTextNode(e.key.toUpperCase()))
           }
         }
+
+        const rect = document.querySelector('rect[tabindex="0"]')
+        const ariaLabel = rect?.getAttribute('aria-label')
+
+        if (ariaLabel && rect) {
+          const { answerLength, letterPosition } = parseAriaLabel(ariaLabel)
+
+          const canMoveForward = letterPosition !== null && answerLength !== null && letterPosition < answerLength
+          if (canMoveForward) {
+            rect.setAttribute('tabindex', '-1')
+            rect.classList.remove('xwd__cell--selected', 'xwd__cell--highlighted')
+
+            const nextRect = findNextCell(rect, 'forward')
+            if (nextRect) {
+              nextRect.setAttribute('tabindex', '0')
+              nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
+              (nextRect as HTMLElement).focus()
+            }
+
+          }
+        }
       }
     } else if (e.key === "Backspace" || e.key === "Delete") {
       const activeCell = document.activeElement
@@ -68,6 +127,27 @@ const makePlayable = () => {
               node.remove()
             }
           })
+        }
+
+        const rect = document.querySelector('rect[tabindex="0"]')
+        const ariaLabel = rect?.getAttribute('aria-label')
+
+        if (ariaLabel && rect) {
+          const { answerLength, letterPosition } = parseAriaLabel(ariaLabel)
+
+          const canMoveBackward = letterPosition !== null && letterPosition > 1
+          if (canMoveBackward) {
+            rect.setAttribute('tabindex', '-1')
+            rect.classList.remove('xwd__cell--selected', 'xwd__cell--highlighted')
+
+            const nextRect = findNextCell(rect, 'backward')
+            if (nextRect) {
+              nextRect.setAttribute('tabindex', '0')
+              nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
+              (nextRect as HTMLElement).focus()
+            }
+
+          }
         }
       }
     }
