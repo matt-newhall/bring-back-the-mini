@@ -135,12 +135,12 @@ const makePlayable = () => {
           const canMoveForward = letterPosition !== null && answerLength !== null && letterPosition < answerLength
           if (canMoveForward) {
             rect.setAttribute('tabindex', '-1')
-            rect.classList.remove('xwd__cell--selected', 'xwd__cell--highlighted')
+            rect.classList.remove('xwd__cell--selected')
 
             const nextRect = findNextCell(rect, 'forward')
             if (nextRect) {
               nextRect.setAttribute('tabindex', '0')
-              nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
+              nextRect.classList.add('xwd__cell--selected');
               (nextRect as HTMLElement).focus()
             }
           }
@@ -168,12 +168,12 @@ const makePlayable = () => {
           const canMoveBackward = letterPosition !== null && letterPosition > 1
           if (canMoveBackward) {
             rect.setAttribute('tabindex', '-1')
-            rect.classList.remove('xwd__cell--selected', 'xwd__cell--highlighted')
+            rect.classList.remove('xwd__cell--selected')
 
             const nextRect = findNextCell(rect, 'backward')
             if (nextRect) {
               nextRect.setAttribute('tabindex', '0')
-              nextRect.classList.add('xwd__cell--selected', 'xwd__cell--highlighted');
+              nextRect.classList.add('xwd__cell--selected');
               (nextRect as HTMLElement).focus()
             }
           }
